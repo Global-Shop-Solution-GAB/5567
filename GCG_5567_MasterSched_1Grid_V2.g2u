@@ -1,0 +1,1686 @@
+Program.Sub.ScreenSU.Start
+Gui.Form..Create
+Gui.Form..Size(15330,9600)
+Gui.Form..MinX(15330)
+Gui.Form..MinY(8760)
+Gui.Form..Position(0,0)
+Gui.Form..BackColor(-2147483633)
+Gui.Form..MousePointer(0)
+Gui.Form..Event(UnLoad,Form_UnLoad)
+Gui.Form..Caption("Master Schedule - Release/Picklist")
+Gui.Form.lblStatus.Create(Label,"****Change****",False,3720,240,0,10620,300,True,0,"Arial",8,-986896,0)
+Gui.Form.pbStatus.Create(ProgressBar)
+Gui.Form.pbStatus.Size(3735,135)
+Gui.Form.pbStatus.Position(10620,480)
+Gui.Form.framePermissions.Create(Frame)
+Gui.Form.framePermissions.Size(1950,510)
+Gui.Form.framePermissions.Position(4365,240)
+Gui.Form.optEdit.Create(Option)
+Gui.Form.optEdit.Enabled(False)
+Gui.Form.optEdit.Size(720,300)
+Gui.Form.optEdit.Position(1095,180)
+Gui.Form.optEdit.Caption("Edit")
+Gui.Form.optEdit.Parent("framePermissions")
+Gui.Form.optView.Create(Option)
+Gui.Form.optView.Size(795,300)
+Gui.Form.optView.Position(150,180)
+Gui.Form.optView.Caption("View")
+Gui.Form.optView.Parent("framePermissions")
+Gui.Form.dtpCutDt.Create(DatePicker)
+Gui.Form.dtpCutDt.Size(1425,285)
+Gui.Form.dtpCutDt.Position(135,375)
+Gui.Form.dtpCutDt.Event(Change,dtpCutDt_Change)
+Gui.Form.lblCutDt.Create(Label,"Cutoff Date:",True,1080,150,0,135,150,True,0,"Arial",8,-2147483633,0)
+Gui.Form.chkBarcode.Create(CheckBox)
+Gui.Form.chkBarcode.Size(1695,225)
+Gui.Form.chkBarcode.Position(1485,840)
+Gui.Form.chkBarcode.Caption("Print Barcode WO")
+Gui.Form.chkBarcode.Event(Click,SavePrint)
+Gui.Form.chkPicklist.Create(CheckBox)
+Gui.Form.chkPicklist.Size(1905,225)
+Gui.Form.chkPicklist.Position(3315,840)
+Gui.Form.chkPicklist.Caption("Print Material Picklist")
+Gui.Form.chkPicklist.Event(Click,SavePrint)
+Gui.Form.lblMatAvail.Create(Label,"**Hit Refresh to check for Material Availability**",False,3480,255,0,10620,705,True,0,"Arial",8,9498256,0)
+Gui.Form.txtCutDays.Create(TextBox,"",True,510,300,0,1680,375,True,0,"Arial",8,-2147483643,1)
+Gui.Form.txtCutDays.NumericOnly(True)
+Gui.Form.txtCutDays.Event(Change,txtCutDays_Change)
+Gui.Form.lblCutDay.Create(Label,"Days:",True,540,150,0,1680,150,True,0,"Arial",8,-2147483633,0)
+Gui.Form.chkPromptWhenRelease.Create(CheckBox)
+Gui.Form.chkPromptWhenRelease.Size(2070,240)
+Gui.Form.chkPromptWhenRelease.Position(4575,1260)
+Gui.Form.chkPromptWhenRelease.Caption("Prompt when Released")
+Gui.Form.chkPromptWhenRelease.Visible(False)
+Gui.Form.lblProgress.Create(Label,"",True,4170,255,0,6390,495,True,0,"Arial",8,-2147483633,0)
+Gui.Form.gsMaster.Create(GsGridControl)
+Gui.Form.gsMaster.Size(15060,7395)
+Gui.Form.gsMaster.Position(105,1590)
+Gui.Form.gsMaster.Event(RowCellClick,GsMaster_RowCellClick)
+Gui.Form.gsMaster.Event(CellValueChanged,GsMaster_CellValueChanged)
+Gui.Form.chkUseCutOff.Create(CheckBox)
+Gui.Form.chkUseCutOff.Size(1290,240)
+Gui.Form.chkUseCutOff.Position(135,825)
+Gui.Form.chkUseCutOff.Caption("Use Cut Off")
+Gui.Form.chkUseCutOff.Value(1)
+Gui.Form.cmdRefresh.Create(Button)
+Gui.Form.cmdRefresh.Size(840,375)
+Gui.Form.cmdRefresh.Position(2325,345)
+Gui.Form.cmdRefresh.Caption("REFRESH")
+Gui.Form.cmdRefresh.Event(Click,cmdRefresh_Click)
+Gui.Form.cmdExport.Create(Button)
+Gui.Form.cmdExport.Size(840,375)
+Gui.Form.cmdExport.Position(3345,345)
+Gui.Form.cmdExport.Caption("Export")
+Gui.Form.cmdExport.Event(Click,cmdExport_Click)
+Gui.Form.cmdReleaseMult.Create(Button)
+Gui.Form.cmdReleaseMult.Size(1335,375)
+Gui.Form.cmdReleaseMult.Position(120,1140)
+Gui.Form.cmdReleaseMult.Caption("Release Multi.")
+Gui.Form.cmdReleaseMult.Event(Click,cmdReleaseMult_Click)
+Gui.Form.cmdUnReleaseMult.Create(Button)
+Gui.Form.cmdUnReleaseMult.Size(1485,375)
+Gui.Form.cmdUnReleaseMult.Position(1575,1140)
+Gui.Form.cmdUnReleaseMult.Caption("UnRelease Multi.")
+Gui.Form.cmdUnReleaseMult.Event(Click,cmdUnReleaseMult_Click)
+Gui.Form.cmdDeSelectAll.Create(Button)
+Gui.Form.cmdDeSelectAll.Size(1230,375)
+Gui.Form.cmdDeSelectAll.Position(3210,1140)
+Gui.Form.cmdDeSelectAll.Caption("Uncheck All")
+Gui.Form.cmdDeSelectAll.Event(Click,cmdDeSelectAll_Click)
+Gui.Form.chkPrintAttach.Create(CheckBox)
+Gui.Form.chkPrintAttach.Size(1905,225)
+Gui.Form.chkPrintAttach.Position(5190,840)
+Gui.Form.chkPrintAttach.Caption("Print Attachment")
+Gui.Form.chkPrintAttach.Value(1)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+	V.Global.bExists.Declare
+	V.Global.bEdit.Declare
+	V.Global.bLongPart.Declare
+	v.Global.bCache.Declare
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'BN, Sept 4, 2019
+'Customer: Dakotaland
+
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare	
+	V.Local.bEditGrp.Declare
+	V.Local.dCutDt.Declare
+	V.Local.sRet.Declare
+	V.Local.iDays.Declare	
+
+	'Open connection
+	F.ODBC.Connection!con.OpenCompanyConnection(1000)
+	
+	'Radio button
+	gui.Form.optEdit.Value(False)
+	gui.Form.optView.Value(True)
+	
+	'Pull Cutoff Days from GS_Registry
+	F.Intrinsic.Control.BlockEvents
+	F.Global.Registry.ReadValue(V.Caller.User,V.Caller.CompanyCode,"OCTSRS.NET.EXE",5567,3000,5,"",V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet,=,"Cutoff Days")
+		F.Global.Registry.ReadValue(V.Caller.User,V.Caller.CompanyCode,"OCTSRS.NET.EXE",5567,3000,1,"",V.Local.iDays)
+		F.Intrinsic.Date.DateAdd("D",V.Local.iDays,V.Ambient.Date,V.Local.dCutDt)
+		gui.Form.txtCutDays.Text(V.Local.iDays)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Date.DateAdd("D",7,V.Ambient.Date,V.Local.dCutDt)
+		gui.Form.txtCutDays.Text("7")
+	F.Intrinsic.Control.EndIf
+	gui.Form.dtpCutDt.Value(V.Local.dCutDt)
+	F.Intrinsic.Control.UnBlockEvents
+	
+	gui.Form.optEdit.Enabled(True)
+
+	'Check User Permissions
+	F.Global.Security.IsInGroup(v.Caller.User,"EditWO",V.Local.bEditGrp)
+	F.Intrinsic.Control.If(v.Local.bEditGrp,=,True)
+		gui.Form.optEdit.Enabled(True)
+		gui.Form.chkBarcode.Enabled(True)
+		gui.Form.chkPicklist.Enabled(True)
+		V.Global.bEdit.Set(True)
+	F.Intrinsic.Control.EndIf
+
+	'0 - None			'1 - Top			'2 - Bottom				'4 - Left				'8 - Right	
+	gui.Form.gsMaster.Anchor(15)
+	gui.Form..Show	
+	
+	F.Intrinsic.Control.BlockEvents
+	F.Intrinsic.Control.CallSub(lockscreen)
+	gui.Form.lblProgress.Caption("checktable...")
+	F.Intrinsic.Control.CallSub(checktable)
+	gui.Form.lblProgress.Caption("checkprint...")
+	F.Intrinsic.Control.CallSub(checkprint)
+	gui.Form.lblProgress.Caption("Load...")
+	F.Intrinsic.Control.CallSub(Load)	
+	gui.Form.lblProgress.Caption("enablescreen...")
+	F.Intrinsic.Control.CallSub(enablescreen)
+	F.Intrinsic.Control.UnBlockEvents
+	
+	gui.Form.lblProgress.Caption("Deserialize...")
+	F.Intrinsic.Control.CallSub(Deserialize)
+	
+	f.Intrinsic.UI.CloseWaitDialog
+	gui.Form.lblProgress.Caption("Loading completed.")
+
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload") 
+	F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.UnLoad.Start
+f.Intrinsic.Control.Try
+	v.Local.sError.Declare
+
+	F.Intrinsic.Control.If(V.ODBC.con.State,=,1)
+		F.ODBC.Connection!con.close
+	F.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.End
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Subroutine called from:{6}{1}Error Occurred: {3}{1}Description: {4}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,v.Ambient.SubroutineCalledFrom,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.UnLoad.End
+
+Program.Sub.cmdRefresh_Click.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	gui.Form.lblProgress.Caption("Serialize...")
+	F.Intrinsic.Control.CallSub(Serialize)
+
+	gui.Form..Caption("Master Schedule - Release/Picklist")
+	V.Global.bCache.Set(False)
+	f.Intrinsic.Control.If(v.DataTable.dtMaster.Exists)
+		gui.Form.gsMaster.ClearRows("gvMaster")
+	f.Intrinsic.Control.EndIf	
+	
+	F.Intrinsic.Control.CallSub(lockscreen)
+	gui.Form.lblProgress.Caption("Loading...")
+	F.Intrinsic.Control.CallSub(Load)
+	F.Intrinsic.Control.CallSub(enablescreen)
+	F.Intrinsic.Control.UnBlockEvents
+	gui.Form.lblProgress.Caption("Deserialize...")
+	F.Intrinsic.Control.CallSub(Deserialize)
+	gui.Form.lblProgress.Caption("Loading completed.")
+
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload") 
+	F.Intrinsic.Control.EndTry
+Program.Sub.cmdRefresh_Click.End
+
+Program.Sub.Form_UnLoad.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	F.Intrinsic.Control.CallSub(Serialize)	
+	f.Intrinsic.Control.CallSub("Unload")
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload") 
+	F.Intrinsic.Control.EndTry
+Program.Sub.Form_UnLoad.End
+
+Program.Sub.CheckTable.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	V.Local.bTable.Declare(Boolean)
+
+	F.ODBC.Connection!con.TableExists("GAB_4169_WO_NOTES",V.Local.bTable)
+	F.Intrinsic.Control.If(V.Local.bTable,=,False)
+		F.ODBC.Connection!Con.Execute("CREATE TABLE GAB_4169_WO_NOTES(JOB CHAR(6),SUFFIX CHAR(3),NOTES LONGVARCHAR);")
+		F.ODBC.Connection!Con.Execute("CREATE INDEX GAB_4169_WO_NOTES01 USING 1 ON GAB_4169_WO_NOTES(JOB);")
+		F.ODBC.Connection!Con.Execute("CREATE INDEX GAB_4169_WO_NOTES02 USING 2 ON GAB_4169_WO_NOTES(SUFFIX);")
+	F.Intrinsic.Control.EndIf
+
+	F.ODBC.Connection!con.TableExists("GAB_5567_PARTS",V.Local.bTable)
+	F.Intrinsic.Control.If(V.Local.bTable,=,False)
+		F.ODBC.Connection!Con.Execute("CREATE TABLE GAB_5567_PARTS(PART CHAR(20),LOCATION CHAR(2),ORIG_ONHAND NUMERIC(12,4),NEW_ONHAND NUMERIC(12,4));")
+		F.ODBC.Connection!Con.Execute("CREATE INDEX GAB_5567_PARTS01 USING 1 ON GAB_5567_PARTS(PART);")
+		F.ODBC.Connection!Con.Execute("CREATE INDEX GAB_5567_PARTS02 USING 2 ON GAB_5567_PARTS(LOCATION);")
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.CheckTable.End
+
+Program.Sub.Load.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	V.Local.iCnt.Declare
+	V.Local.iProgress.Declare
+	V.Local.sSQL.Declare
+	V.Local.sRet.Declare
+	V.Local.sJob.Declare
+	V.Local.sSuffix.Declare
+	V.Local.fEstHrs.Declare
+	V.Local.fRemHrs.Declare
+	V.Local.fPcsRem.Declare
+	V.Local.sCurOper.Declare
+	V.Local.dCurOperDate.Declare
+	V.Local.sNextOper.Declare
+	V.Local.sOutside.Declare
+	V.Local.dShipDate.Declare
+	V.Local.dDateCheck.Declare(Date,01/01/1900)
+	V.Local.bDictExists.Declare
+	V.Local.sDept.Declare
+	V.Local.bIssued.Declare
+	V.Local.dDateTime.Declare
+	V.Local.sCaption.Declare
+	v.Local.dDate1.Declare
+	v.Local.dDate2.Declare
+	v.Local.iDiff1.Declare
+	v.Local.iDiff2.Declare
+	v.Local.dCutOff.Declare
+	v.Local.sFilter.Declare
+
+	gui.Form.lblStatus.Visible(True)
+	gui.Form.pbStatus.Visible(True)
+	gui.Form.lblStatus.ForeColor(V.Color.Black)
+	gui.Form.lblStatus.FontSize(8)
+	gui.Form.lblStatus.Caption("Work Orders....")
+
+	F.Intrinsic.Control.If(V.DataTable.dtAll.Exists)
+		F.Data.DataTable.Close("dtAll")
+	F.Intrinsic.Control.EndIf
+
+	F.Data.Dictionary.Exists("dIndirect",V.Local.bDictExists)
+	F.Intrinsic.Control.If(V.Local.bDictExists)
+		F.Data.Dictionary.Close("dIndirect")
+	F.Intrinsic.Control.EndIf
+
+	gui.Form.lblProgress.Caption("Processing...")
+
+	gui.Form.lblProgress.Caption("Getting data for table dIndirect dictionary...")
+	F.Data.Dictionary.CreateFromSQL("dIndirect","con","SELECT DISTINCT CONCAT(JOB,SUFFIX) AS JS,CONVERT(IF('' = '',1,0),SQL_BIT) FROM IND_LBR_ACCTS;")
+	F.Data.Dictionary.SetDefaultReturn("dIndirect",False)
+	
+	v.Local.dCutOff.Set(v.Screen.Form!dtpCutDt.Value)
+	gui.Form.lblProgress.Caption("Getting data for table dtAll...")
+	f.Intrinsic.String.Build("SELECT CAST(CASE WHEN FLAG_WO_PRTD = 'Y' OR FLAG_WO_PRTD = 'R' THEN 1 ELSE 0 END AS BIT) AS PRINTED,CAST(CASE WHEN FLAG_WO_RELEASED = 'Y' THEN 1 ELSE 0 END AS BIT) AS RELEASED,CONVERT(0,SQL_BIT) as SelectForMultProcess,CASE WHEN VJH.FLAG_HOLD = 'Y' THEN CONVERT(1,SQL_BIT) WHEN VJH.FLAG_HOLD = 'N' THEN CONVERT(0,SQL_BIT) ELSE CONVERT(0,SQL_BIT) END AS FLAG_HOLD,VJH.JOB,VJH.SUFFIX,VJH.JOB + '-' +  VJH.SUFFIX as JobSuffix,PRIORITY,NAME_CUSTOMER,COALESCE(VJH.PART,'') AS PART,'' As DISPLAY_PART,VJH.LOCATION,PRODUCT_LINE,DESCRIPTION,Date_Opened,COALESCE((select top 1 vjo.date_start from v_job_operations vjo where vjo.lmo = 'L' and VJO.JOB = VJH.JOB and VJO.SUFFIX = VJH.SUFFIX and VJO.SEQ < '990000'),'1900-01-01') AS DATE_START1,DATE_DUE,SCHEDULED_DUE_DATE,CONVERT(0,SQL_FLOAT) AS EST_HRS,NUM_HOURS AS ACT_HRS,CONVERT(0,SQL_FLOAT) AS REM_HRS,'' AS DEPT,DATE_DUE AS CUR_OPER_DATE,'' AS CUR_OPER,'' AS NEXT_OPER,'' AS OUTSIDE,CONVERT(NULL,SQL_DATE) AS SHIP_TO_OP,QTY_ORDER,QTY_ORDER - QTY_COMPLETED AS PCS_REM1,GWN.NOTES AS 'WO_NOTE',VWUF.USER_6 AS 'WO_NOTE2',CONCAT(VJH.JOB,VJH.SUFFIX) AS JS,CASE WHEN CODE_SOURCE IS NULL THEN 'F' ELSE CODE_SOURCE END AS CODE_SOURCE,'' AS PCS_REM,CONVERT(0,SQL_BIT) AS LATE,     CONVERT(0,SQL_BIT) AS IND_FLAG,CONVERT(0,SQL_BIT) AS ISSUED,'N' AS READY,VJH.CUSTOMER_PO FROM V_JOB_HEADER VJH LEFT JOIN V_CUSTOMER_MASTER VCM ON VJH.CUSTOMER=VCM.CUSTOMER LEFT JOIN V_WO_USER_FLDS VWUF ON VJH.JOB = VWUF.JOB AND VJH.SUFFIX = VWUF.SUFFIX LEFT JOIN GAB_4169_WO_NOTES GWN ON VJH.JOB = GWN.JOB AND VJH.SUFFIX = GWN.SUFFIX LEFT JOIN V_INVENTORY_Mst2 VIM ON VJH.part = VIM.PART AND VJH.LOCATION = VIM.LOCATION WHERE DATE_CLOSED = '1900-1-1' and Date_Start1 <= '{0}' ORDER BY DATE_START,PRIORITY,VJH.JOB,VJH.SUFFIX;",v.Local.dCutOff.PervasiveDate,v.Local.sSQL)
+	F.Data.DataTable.CreateFromSQL("dtAll","con",v.Local.sSQL,True)
+	
+	f.Data.DataTable.AddExpressionColumn("dtAll","DATE_START","Date","DATE_START1")
+	F.Data.DataTable.AddDisplayPartColumn("dtAll",0,"PART","DISPLAY_PART")
+	
+	'BN July 26 2019 Add extra columns FirstLaborDate, ParentWODueDate,SchedDiff, FirstLaborDiff
+	f.Data.DataTable.AddColumn("dtAll","FirstLaborDate","Date","01-01-1900")
+	f.Data.DataTable.AddColumn("dtAll","ParentWODueDate","Date","01-01-1900")
+	
+	gui.Form.lblProgress.Caption("Getting data for dictionary ParentWODueDateDict...")
+	f.Data.Dictionary.CreateFromSQL("ParentWODueDateDict","con","select Job,Date_Due from v_Job_Header where suffix = '000'")
+	f.Data.Dictionary.SetDefaultReturn("ParentWODueDateDict","01-01-1900")
+	f.Data.DataTable.FillFromDictionary("dtAll","ParentWODueDateDict","Job","ParentWODueDate")
+	f.Data.Dictionary.Close("ParentWODueDateDict")
+	
+	gui.Form.lblProgress.Caption("Getting data for dictionary FirstLaborDict...")
+	f.Data.Dictionary.CreateFromSQL("FirstLaborDict","con","select Job + '-'+ Suffix as JobSuffix, Min(Date_Due) from v_job_operations where LMO = 'L' and Seq < '990000' group by JobSuffix")
+	f.Data.Dictionary.SetDefaultReturn("FirstLaborDict","01-01-1900")
+	f.Data.DataTable.FillFromDictionary("dtAll","FirstLaborDict","JobSuffix","FirstLaborDate")
+	f.Data.Dictionary.Close("FirstLaborDict")
+	
+	f.Data.DataTable.AddColumn("dtAll","SchedDiff","Long",0)
+	f.Data.DataTable.AddColumn("dtAll","FirstLaborDiff","Long",0)
+	
+	'Operations
+	gui.Form.lblProgress.Caption("Getting data for Operations...")
+	f.Intrinsic.Control.If(v.DataTable.Ops.Exists)
+		f.Data.DataTable.Close("Ops")
+	f.Intrinsic.Control.EndIf
+	f.Data.DataTable.CreateFromSQL("Ops","con","SELECT A.JOB,A.SFX,A.SEQ,A.SEQTYPE,A.SEQRES,A.PCSREMAIN,CONVERT(CASE WHEN A.STARTDATE IS NULL THEN '1900-01-01' ELSE A.STARTDATE END,SQL_DATE) AS STARTDATE,IF(WORK_GROUP <> '',D.WC_DEPT,B.WC_DEPT) AS DEPT FROM APSV3_JBLINES A LEFT JOIN WORKCENTERS B ON A.SEQRES = B.MACHINE LEFT JOIN WORKGROUP_HEAD C ON A.SEQRES = C.WORK_GROUP LEFT JOIN WORKCENTERS D ON C.PROTOTYPE_WC = D.MACHINE WHERE A.COMPLDATE IS NULL AND A.SEQTYPE <> '2'",True)
+	f.Data.DataView.Create("Ops","dvOps")	
+	
+	'SeqType3 for all
+	gui.Form.lblProgress.Caption("Getting data for SeqType3...")
+	f.Intrinsic.Control.If(v.DataTable.SeqType3.Exists)
+		f.Data.DataTable.Close("SeqType3")
+	f.Intrinsic.Control.EndIf
+	f.Data.DataTable.CreateFromSQL("SeqType3","con","SELECT JOB,SFX,SEQ,SEQRES,CONVERT(CASE WHEN STARTDATE IS NULL THEN '1900-01-01' ELSE STARTDATE END,SQL_DATE) AS STARTDATE FROM APSV3_JBLINES WHERE SEQTYPE = '3' AND COMPLDATE IS NULL",True)
+	f.Data.DataView.Create("SeqType3","dvSeqType3")
+
+	'SeqType2 for all
+	gui.Form.lblProgress.Caption("Getting data for SeqType2...")
+	f.Intrinsic.Control.If(v.DataTable.SeqType2.Exists)
+		f.Data.DataTable.Close("SeqType2")
+	f.Intrinsic.Control.EndIf
+	f.Data.DataTable.CreateFromSQL("SeqType2","con","Select JOB,SFX,SEQTYPE from APSV3_JBLINES where SEQTYPE ='2' and COMPLDATE Is Null;",True)
+	f.Data.DataView.Create("SeqType2","dvSeqType2")		
+	
+	'Sum HoursOrig + InitSU for all
+	gui.Form.lblProgress.Caption("Getting data for HoursOrig + InitSU...")
+	f.Intrinsic.Control.If(v.DataTable.SumHnI.Exists)
+		f.Data.DataTable.Close("SumHnI")
+	f.Intrinsic.Control.EndIf
+	f.Data.DataTable.CreateFromSQL("SumHnI","con","SELECT JOB,SFX,CONVERT(SUM(HOURSORIG+INITSU),SQL_NUMERIC) AS EST_HRS FROM APSV3_JBLINES WHERE SEQTYPE = '1' GROUP BY JOB,SFX;",True)
+	f.Data.DataView.Create("SumHnI","dvSumHnI")
+	
+	'Set Indicator
+	gui.Form.pbStatus.Min(0)
+	f.Intrinsic.Control.If(v.DataTable.dtAll.RowCount,>,0)
+		gui.Form.pbStatus.Max(v.DataTable.dtAll.RowCount)
+	f.Intrinsic.Control.EndIf
+	gui.Form.lblProgress.Caption("Looping to set Indirect and WIP FG...")
+	
+	F.Intrinsic.Control.For(V.Local.iCnt,0,V.DataTable.dtAll.RowCount--,1)
+		F.Intrinsic.Math.Add(V.Local.iProgress,1,V.Local.iProgress)
+		gui.Form.pbStatus.Value(V.Local.iProgress)
+				
+		V.Local.sJob.Set(V.DataTable.dtAll(V.Local.iCnt).JOB!FieldValTrim)
+		V.Local.sSuffix.Set(V.DataTable.dtAll(V.Local.iCnt).SUFFIX!FieldValTrim)
+		
+		'Build Filter by Job,Suffix
+		f.Intrinsic.String.Build("JOB = '{0}' AND SFX = '{1}'",V.Local.sJob,V.Local.sSuffix,v.Local.sFilter)
+		f.Data.DataView.SetFilter("Ops","dvOps",v.Local.sFilter)
+		f.Data.DataView.SetSort("Ops","dvOps","Job,Sfx,Seq")
+	
+		'Initialize variables
+		V.Local.sDept.Set("")
+		V.Local.sCurOper.Set("")
+		V.Local.dCurOperDate.Set(01/01/1900)
+		V.Local.sNextOper.Set("")
+		V.Local.sOutside.Set("")
+		V.Local.dShipDate.Set(01/01/1900)
+		V.Local.bIssued.Set(True)
+		V.Local.fPcsRem.Set(0)
+		
+		f.Intrinsic.Control.If(v.DataView.Ops!dvOps.RowCount,=,0)
+			V.Local.sCurOper.Set("WIPTOFG")
+			V.Local.fPcsRem.Set(0)
+			V.Local.sNextOper.Set("")	
+		f.Intrinsic.Control.ElseIf(v.DataView.Ops!dvOps.RowCount,=,1)
+
+			F.Intrinsic.Control.SelectCase(v.DataView.Ops!dvOps(0).SEQTYPE!FieldValTrim)
+				F.Intrinsic.Control.Case(1)			
+					V.Local.sDept.Set(v.DataView.Ops!dvOps(0).DEPT!FieldValTrim)
+					V.Local.sCurOper.Set(v.DataView.Ops!dvOps(0).SEQRES!FieldValTrim)
+					F.Intrinsic.Control.If(v.DataView.Ops!dvOps(0).STARTDATE!FieldVal,=,"")
+						V.Local.dCurOperDate.Set(01/01/1900)
+					F.Intrinsic.Control.Else
+						V.Local.dCurOperDate.Set(v.DataView.Ops!dvOps(0).STARTDATE!FieldVal)
+					F.Intrinsic.Control.EndIf
+					V.Local.fPcsRem.Set(v.DataView.Ops!dvOps(0).PCSREMAIN!FieldValString)
+				F.Intrinsic.Control.Case(3)
+					V.Local.sCurOper.Set("OUTSIDE")
+					V.Local.dCurOperDate.Set(v.DataView.Ops!dvOps(0).STARTDATE!FieldVal)
+					V.Local.fPcsRem.Set(v.DataView.Ops!dvOps(0).PCSREMAIN!FieldValString)
+			F.Intrinsic.Control.EndSelect
+			
+		f.Intrinsic.Control.ElseIf(v.DataView.Ops!dvOps.RowCount,>=,2)
+			'First record
+			F.Intrinsic.Control.SelectCase(v.DataView.Ops!dvOps(0).SEQTYPE!FieldValTrim)
+				F.Intrinsic.Control.Case(1)			
+					V.Local.sDept.Set(v.DataView.Ops!dvOps(0).DEPT!FieldValTrim)
+					V.Local.sCurOper.Set(v.DataView.Ops!dvOps(0).SEQRES!FieldValTrim)
+					F.Intrinsic.Control.If(v.DataView.Ops!dvOps(0).STARTDATE!FieldVal,=,"")
+						V.Local.dCurOperDate.Set(01/01/1900)
+					F.Intrinsic.Control.Else
+						V.Local.dCurOperDate.Set(v.DataView.Ops!dvOps(0).STARTDATE!FieldVal)
+					F.Intrinsic.Control.EndIf
+					V.Local.fPcsRem.Set(v.DataView.Ops!dvOps(0).PCSREMAIN!FieldValString)
+				F.Intrinsic.Control.Case(3)
+					V.Local.sCurOper.Set("OUTSIDE")
+					V.Local.dCurOperDate.Set(v.DataView.Ops!dvOps(0).STARTDATE!FieldVal)
+					V.Local.fPcsRem.Set(v.DataView.Ops!dvOps(0).PCSREMAIN!FieldValString)
+			F.Intrinsic.Control.EndSelect		
+			
+			'Second Record
+			F.Intrinsic.Control.SelectCase(v.DataView.Ops!dvOps(0).SEQTYPE!FieldValTrim)
+				F.Intrinsic.Control.Case(1)
+					F.Intrinsic.Control.If(V.Local.sCurOper,=,"")
+						V.Local.sDept.Set(v.DataView.Ops!dvOps(1).DEPT!FieldValTrim)
+						V.Local.sCurOper.Set(v.DataView.Ops!dvOps(1).SEQRES!FieldValTrim)
+						F.Intrinsic.Control.If(v.DataView.Ops!dvOps(1).STARTDATE!FieldVal,=,"")
+							V.Local.dCurOperDate.Set(01/01/1900)
+						F.Intrinsic.Control.Else
+							V.Local.dCurOperDate.Set(v.DataView.Ops!dvOps(1).STARTDATE!FieldVal)
+						F.Intrinsic.Control.EndIf
+					F.Intrinsic.Control.Else
+						V.Local.sNextOper.Set(v.DataView.Ops!dvOps(1).SEQRES!FieldValTrim)
+					F.Intrinsic.Control.EndIf
+					V.Local.fPcsRem.Set(v.DataView.Ops!dvOps(1).PCSREMAIN!FieldValString)
+				F.Intrinsic.Control.Case(3)
+					F.Intrinsic.Control.If(V.Local.sCurOper,=,"")
+						V.Local.sCurOper.Set("OUTSIDE")
+						V.Local.dCurOperDate.Set(v.DataView.Ops!dvOps(1).STARTDATE!FieldVal)
+						V.Local.fPcsRem.Set(v.DataView.Ops!dvOps(1).PCSREMAIN!FieldValString)
+					F.Intrinsic.Control.Else
+						F.Intrinsic.Control.If(V.Local.sOutside,=,"")
+							V.Local.sNextOper.Set("OUTSIDE")
+						F.Intrinsic.Control.Else
+							V.Local.sNextOper.Set("OUTSIDE")
+						F.Intrinsic.Control.EndIf
+					F.Intrinsic.Control.EndIf
+			F.Intrinsic.Control.EndSelect	
+		
+		f.Intrinsic.Control.EndIf
+		
+		'SeqType3
+		f.Data.DataView.SetFilter("SeqType3","dvSeqType3",v.Local.sFilter)
+		f.Data.DataView.SetSort("SeqType3","dvSeqType3","SEQ")		
+		f.Intrinsic.Control.If(v.DataView.SeqType3!dvSeqType3.RowCount,>,0)
+			V.Local.dShipDate.Set(v.DataView.SeqType3!dvSeqType3(0).STARTDATE!FieldValString)
+			v.Local.sOutside.Set(v.DataView.SeqType3!dvSeqType3(0).SEQRES!FieldValString)
+		f.Intrinsic.Control.Else
+			V.Local.dShipDate.Set()
+			v.Local.sOutside.Set("")
+		f.Intrinsic.Control.EndIf	
+
+		'Sum HoursOrig + InitSU		
+		f.Data.DataView.SetFilter("SumHnI","dvSumHnI",V.Local.sFilter)
+		F.Intrinsic.Control.If(V.DataView.SumHnI!dvSumHnI.RowCount,>,0)
+			V.Local.fEstHrs.Set(v.DataView.SumHnI!dvSumHnI(0).Est_Hrs!FieldValString)
+			f.Intrinsic.Control.If(v.Local.fEstHrs,=,0)
+				V.Local.fEstHrs.Set(0.00)
+				V.Local.fRemHrs.Set(0.00)			
+			f.Intrinsic.Control.Else
+				F.Intrinsic.Math.Sub(V.Local.fEstHrs,V.DataTable.dtAll(V.Local.iCnt).ACT_HRS!FieldValFloat,V.Local.fRemHrs)
+			f.Intrinsic.Control.EndIf			
+		f.Intrinsic.Control.Else
+			V.Local.fEstHrs.Set(0.00)
+			V.Local.fRemHrs.Set(0.00)	
+		F.Intrinsic.Control.EndIf
+
+		'SeqType2 for bIssue
+		f.Intrinsic.String.Build("JOB = '{0}' AND SFX = '{1}'",V.Local.sJob,V.Local.sSuffix,v.Local.sFilter)
+		f.Data.DataView.SetFilter("SeqType2","dvSeqType2",v.Local.sFilter)
+		f.Intrinsic.Control.If(v.DataView.SeqType2!dvSeqType2.RowCount,>,0)
+			v.Local.bIssued.Set(False)
+		f.Intrinsic.Control.EndIf
+		
+		'Set Date Diff
+		v.Local.dDate1.Set(v.DataTable.dtAll(v.local.iCnt).ParentWODueDate!FieldValString)
+		v.Local.dDate2.Set(v.DataTable.dtAll(v.local.iCnt).Scheduled_Due_Date!FieldValString)
+		f.Intrinsic.Date.DateDiff("d",v.Local.dDate2,v.Local.dDate1,v.Local.iDiff1)		
+		v.Local.dDate2.Set(v.DataTable.dtAll(v.local.iCnt).Date_Start!FieldValString)
+		f.Intrinsic.Date.DateDiff("d",v.Local.dDate2,v.Local.dDate1,v.Local.iDiff2)		
+		f.Data.DataTable.SetValue("dtAll",v.Local.iCnt,"SchedDiff",v.Local.iDiff1,"FirstLaborDiff",v.Local.iDiff2)
+		
+		'If dCurOperDate = 01/01/1900 and dShipDate = 01/01/1900
+		F.Intrinsic.Control.If(V.Local.dCurOperDate,=,V.Local.dDateCheck)
+		F.Intrinsic.Control.AndIf(V.Local.dShipDate,=,V.Local.dDateCheck)
+			F.Data.DataTable.SetValue("dtAll",V.Local.iCnt,"EST_HRS",V.Local.fEstHrs,"REM_HRS",V.Local.fRemHrs,"DEPT",V.Local.sDept,"CUR_OPER",V.Local.sCurOper,"NEXT_OPER",V.Local.sNextOper,"OUTSIDE",V.Local.sOutside,"PCS_REM",V.Local.fPcsRem,"ISSUED",v.Local.bIssued,"SchedDiff",v.Local.iDiff1,"FirstLaborDiff",v.Local.iDiff2)		
+		F.Intrinsic.Control.ElseIf(V.Local.dCurOperDate,=,V.Local.dDateCheck)
+			F.Data.DataTable.SetValue("dtAll",V.Local.iCnt,"EST_HRS",V.Local.fEstHrs,"REM_HRS",V.Local.fRemHrs,"DEPT",V.Local.sDept,"CUR_OPER",V.Local.sCurOper,"NEXT_OPER",V.Local.sNextOper,"OUTSIDE",V.Local.sOutside,"PCS_REM",V.Local.fPcsRem,"ISSUED",v.Local.bIssued,"SchedDiff",v.Local.iDiff1,"FirstLaborDiff",v.Local.iDiff2,"SHIP_TO_OP",V.Local.dShipDate)
+		F.Intrinsic.Control.ElseIf(V.Local.dShipDate,=,V.Local.dDateCheck)
+			F.Data.DataTable.SetValue("dtAll",V.Local.iCnt,"EST_HRS",V.Local.fEstHrs,"REM_HRS",V.Local.fRemHrs,"DEPT",V.Local.sDept,"CUR_OPER",V.Local.sCurOper,"NEXT_OPER",V.Local.sNextOper,"OUTSIDE",V.Local.sOutside,"PCS_REM",V.Local.fPcsRem,"ISSUED",v.Local.bIssued,"SchedDiff",v.Local.iDiff1,"FirstLaborDiff",v.Local.iDiff2,"CUR_OPER_DATE",V.Local.dCurOperDate)
+		F.Intrinsic.Control.Else
+			F.Data.DataTable.SetValue("dtAll",V.Local.iCnt,"EST_HRS",V.Local.fEstHrs,"REM_HRS",V.Local.fRemHrs,"DEPT",V.Local.sDept,"CUR_OPER",V.Local.sCurOper,"NEXT_OPER",V.Local.sNextOper,"OUTSIDE",V.Local.sOutside,"PCS_REM",V.Local.fPcsRem,"ISSUED",v.Local.bIssued,"SchedDiff",v.Local.iDiff1,"FirstLaborDiff",v.Local.iDiff2,"CUR_OPER_DATE",V.Local.dCurOperDate,"SHIP_TO_OP",V.Local.dShipDate)
+		F.Intrinsic.Control.EndIf		
+		
+	F.Intrinsic.Control.Next(V.Local.iCnt)
+	F.Data.DataTable.FillFromDictionary("dtAll","dIndirect","JS","IND_FLAG")
+	
+	F.Intrinsic.Control.CallSub(LoadDTMaster)
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.Load.End
+
+Program.Sub.LoadDTMaster.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	V.Local.sFilter.Declare
+	V.Local.dCutDate.Declare
+
+	F.Intrinsic.Control.If(V.DataTable.dtMaster.Exists,=,true)
+		F.Data.DataTable.Close("dtMaster")
+	F.Intrinsic.Control.EndIf
+
+	V.Local.dCutDate.Set(V.Screen.Form!dtpCutDt.Value)
+
+	F.Intrinsic.Control.If(V.Screen.Form!chkUseCutOff.Value,=,1)
+		F.Intrinsic.String.Build("IND_FLAG <> True AND DATE_START <= #{0}#",V.Local.dCutDate.FormatMM/DD/YYYY,V.Local.sFilter)
+		F.Data.DataView.Create("dtAll","dvMaster",22,V.Local.sFilter,"DATE_START,PRIORITY,JOB,SUFFIX")
+	F.Intrinsic.Control.Else
+		F.Data.DataView.Create("dtAll","dvMaster",22,"IND_FLAG <> True","DATE_START,PRIORITY,JOB,SUFFIX")
+	F.Intrinsic.Control.EndIf
+
+	F.Data.DataView.ToDataTable("dtAll","dvMaster","dtMaster",True)
+	f.Data.DataView.Create("dtMaster","MasterView")
+
+	F.Intrinsic.Control.CallSub(LoadgvMaster)
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.LoadDTMaster.End
+
+Program.Sub.LoadGVMaster.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	v.local.iCnt.Declare
+	V.Local.sGabFile.Declare
+
+	gui.Form.gsMaster.AddGridviewFromDatatable("gvMaster","dtMaster")
+	gui.Form.gsMaster.SuspendLayout()
+	gui.Form.gsMaster.SetGridViewProperty("gvMaster","MultiSelect",True)
+	gui.Form.gsMaster.SetGridViewProperty("gvMaster","AllowSort",True)
+	gui.Form.gsMaster.SetGridViewProperty("gvMaster","AllowFilter",True)
+	gui.Form.gsMaster.SetGridViewProperty("gvMaster","OptionsDetailShowDetailTabs",False)
+	gui.Form.gsMaster.SetGridViewProperty("gvMaster","OptionsViewShowGroupPanel",True)
+	gui.Form.gsMaster.SetGridViewProperty("gvMaster","OptionsMenuShowAutoFilterRowItem",False)
+	gui.Form.gsMaster.SetGridViewProperty("gvMaster","OptionsViewShowAutoFilterRow",True)
+	gui.Form.gsMaster.SetGridViewProperty("gvMaster","OptionsFindAlwaysVisible",True)
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PCS_REM","Visible",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","LATE","Visible",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","JS","Visible",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","IND_FLAG","Visible",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","ISSUED","Visible",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CODE_SOURCE","Visible",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","READY","Visible",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PART","Visible",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","Date_Start1","Visible",False)
+
+	'BN July 26 2019
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","FirstLaborDate","MinWidth","85")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","FirstLaborDate","DisplayCustomDatetime","d")
+	
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","ParentWODueDate","MinWidth","85")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","ParentWODueDate","DisplayCustomDatetime","d")
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SchedDiff","MinWidth","85")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SchedDiff","DisplayCustomDatetime","d")
+	
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","FirstLaborDiff","MinWidth","85")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","FirstLaborDiff","DisplayCustomDatetime","d")
+	
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","JobSuffix","Visible",False)
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRINTED","Caption","Printed")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","RELEASED","Caption","Released")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","FLAG_HOLD","Caption","On Hold")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","JOB","Caption","Job")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SUFFIX","Caption","Suf")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRIORITY","Caption","Priority")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","NAME_CUSTOMER","Caption","Customer Name")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DISPLAY_PART","Caption","Part")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","LOCATION","Caption","Loc")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRODUCT_LINE","Caption","PL")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DESCRIPTION","Caption","Description")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_START","Caption","1st Lbr St Dt")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_DUE","Caption","WO Due Date")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SCHEDULED_DUE_DATE","Caption","Sched Due Date")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","EST_HRS","Caption","Est. Hrs.")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","ACT_HRS","Caption","Act. Hrs.")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","REM_HRS","Caption","Rem. Hrs.")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DEPT","Caption","Dept.")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUR_OPER_DATE","Caption","Cur. Op. Date")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUR_OPER","Caption","Current Op.")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","NEXT_OPER","Caption","Next Op.")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","OUTSIDE","Caption","Outside Process")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SHIP_TO_OP","Caption","Ship To Op")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","QTY_ORDER","Caption","Order Qty")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PCS_REM1","Caption","Pcs Rem")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE","Caption","Notes")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE2","Caption","User Field 6 (70 Characters)")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUSTOMER_PO","Caption","Customer PO")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","Date_Opened","Caption","Date Created")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SelectForMultProcess","Caption","Select Multi.")
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRINTED","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","RELEASED","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","FLAG_HOLD","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","JOB","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SUFFIX","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRIORITY","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","NAME_CUSTOMER","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DISPLAY_PART","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","LOCATION","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRODUCT_LINE","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DESCRIPTION","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_START","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_DUE","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SCHEDULED_DUE_DATE","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","EST_HRS","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","ACT_HRS","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","REM_HRS","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DEPT","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUR_OPER_DATE","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUR_OPER","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","NEXT_OPER","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","OUTSIDE","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SHIP_TO_OP","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","QTY_ORDER","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PCS_REM1","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE","AllowEdit",True)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE2","AllowEdit",True)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUSTOMER_PO","AllowEdit",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SelectForMultProcess","AllowEdit",True)
+	
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SelectForMultProcess","ReadOnly",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE","ReadOnly",False)
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE2","ReadOnly",False)
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","Date_Opened","MinWidth","75")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRINTED","MinWidth","55")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","RELEASED","MinWidth","55")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","FLAG_HOLD","MinWidth","55")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","JOB","MinWidth","50")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SUFFIX","MinWidth","30")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRIORITY","MinWidth","50")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","NAME_CUSTOMER","MinWidth","180")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DISPLAY_PART","MinWidth","140")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","LOCATION","MinWidth","30")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRODUCT_LINE","MinWidth","30")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DESCRIPTION","MinWidth","200")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_START","MinWidth","75")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_DUE","MinWidth","75")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SCHEDULED_DUE_DATE","MinWidth","85")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","EST_HRS","MinWidth","95")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","ACT_HRS","MinWidth","95")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","REM_HRS","MinWidth","95")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DEPT","MinWidth","60")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUR_OPER_DATE","MinWidth","85")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUR_OPER","MinWidth","70")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","NEXT_OPER","MinWidth","60")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","OUTSIDE","MinWidth","95")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SHIP_TO_OP","MinWidth","70")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","QTY_ORDER","MinWidth","60")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PCS_REM1","MinWidth","60")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE","MinWidth","200")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE2","MinWidth","200")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUSTOMER_PO","MinWidth","115")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PCS_REM","MinWidth","95")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SelectForMultProcess","MinWidth","65")	
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRINTED","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","RELEASED","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","FLAG_HOLD","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","JOB","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SUFFIX","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRIORITY","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","NAME_CUSTOMER","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DISPLAY_PART","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","LOCATION","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRODUCT_LINE","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DESCRIPTION","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_START","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_DUE","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SCHEDULED_DUE_DATE","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","EST_HRS","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","ACT_HRS","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","REM_HRS","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DEPT","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUR_OPER_DATE","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUR_OPER","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","NEXT_OPER","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","OUTSIDE","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SHIP_TO_OP","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","QTY_ORDER","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PCS_REM1","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE2","HeaderHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","Date_Opened","HeaderHAlignment","Center")
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRINTED","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","RELEASED","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","FLAG_HOLD","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","JOB","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SUFFIX","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRIORITY","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","LOCATION","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRODUCT_LINE","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_START","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_DUE","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SCHEDULED_DUE_DATE","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DEPT","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUR_OPER_DATE","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SHIP_TO_OP","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","QTY_ORDER","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRINTED","CellHAlignment","Center")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","Date_Opened","CellHAlignment","Center")
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE","CellBackColor","LightYellow")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","WO_NOTE2","CellBackColor","LightYellow")
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","JOB","CellForeColor","Blue")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SUFFIX","CellForeColor","Blue")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DISPLAY_PART","CellForeColor","Blue")
+
+	F.Intrinsic.String.Build("{0}\GAB_4228_Repl_Upd_Resched_Utility.g2u",V.Caller.GasDir,V.Local.sGabFile)
+	F.Intrinsic.File.Exists(V.Local.sGabFile,V.Global.bExists)
+	F.Intrinsic.Control.If(V.Global.bExists)
+		gui.Form.gsMaster.SetColumnProperty("gvMaster","CUR_OPER","CellForeColor","Blue")
+		gui.Form.gsMaster.SetColumnProperty("gvMaster","NEXT_OPER","CellForeColor","Blue")
+	F.Intrinsic.Control.EndIf
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRINTED","Fixed","Left")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","RELEASED","Fixed","Left")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","FLAG_HOLD","Fixed","Left")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","JOB","Fixed","Left")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SUFFIX","Fixed","Left")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PRIORITY","Fixed","Left")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SelectForMultProcess","Fixed","Left")
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","EST_HRS","DisplayCustomNumeric","#,###,###,##0.00")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","ACT_HRS","DisplayCustomNumeric","#,###,###,##0.00")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","REM_HRS","DisplayCustomNumeric","#,###,###,##0.00")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","PCS_REM","DisplayCustomNumeric","#,###,###,##0.00")
+
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","Date_Opened","DisplayCustomDatetime","d")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_START","DisplayCustomDatetime","d")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","DATE_DUE","DisplayCustomDatetime","d")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SCHEDULED_DUE_DATE","DisplayCustomDatetime","d")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","CUR_OPER_DATE","DisplayCustomDatetime","d")
+	gui.Form.gsMaster.SetColumnProperty("gvMaster","SHIP_TO_OP","DisplayCustomDatetime","d")
+
+	F.Intrinsic.Control.If(V.Global.bLongPart)
+		gui.Form.gsMaster.SetColumnProperty("gvMaster","DISPLAY_PART","MinWidth","250")
+	F.Intrinsic.Control.EndIf
+	
+	gui.Form.gsMaster.AddSummaryItem("gvMaster","EST_HRS","SUM_EST_HRS","Sum","","","n")
+	gui.Form.gsMaster.AddSummaryItem("gvMaster","ACT_HRS","SUM_ACT_HRS","Sum","","","n")
+	gui.Form.gsMaster.AddSummaryItem("gvMaster","REM_HRS","SUM_REM_HRS","Sum","","","n")
+
+	gui.Form.gsMaster.ResumeLayout()
+	gui.Form.gsMaster.MainView("gvMaster")
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.LoadGVMaster.End
+
+Program.Sub.GsMaster_RowCellClick.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	v.Local.sTemp.Declare
+	v.Local.sSuf.Declare
+	v.Local.sJob.Declare
+	V.Local.sPart.Declare
+	v.Local.sLoc.Declare
+	v.Local.stemp2.Declare
+	v.Local.stemp3.Declare
+	V.Local.sParams.Declare
+	V.Local.iDayTrf.Declare
+	V.Local.iMonthTrf.Declare
+	V.Local.iYearTrf.Declare
+	V.Local.sSQL.Declare
+	V.Local.sWC.Declare
+	V.Local.sWG.Declare
+	V.Local.iPID.Declare
+	V.Local.sGabFile.Declare
+	V.Local.sHold.Declare
+	V.Local.iHold.Declare
+	V.Local.bHold.Declare
+	V.Local.bRel.Declare
+
+	v.Local.iLinkID.Declare	
+	v.Local.sYesNo.Declare
+	v.Local.iCnt.Declare
+	v.Local.sFile.Declare
+	v.Local.bExist.Declare
+	v.Local.iHndl.Declare
+
+
+	v.Local.sFilter.Declare
+	v.Local.sUSuffixes.Declare
+	v.Local.sTargetJobRows.Declare
+	v.Local.sTimeStamp.Declare
+	v.Local.iInner.Declare
+	v.Local.sRet.Declare
+	
+	v.Local.sPrintProgramPath.Declare
+	v.Local.sSwitches.Declare
+	v.Local.iPIDReturn.Declare
+	v.Local.sColumn.Declare
+	
+	f.Intrinsic.String.UCase(v.Args.Column,v.Local.sColumn)
+
+	f.Intrinsic.Control.SelectCase(v.Local.sColumn)
+		f.Intrinsic.Control.Case("JOB")
+			gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","JOB",v.Args.RowIndex,v.Local.sTemp)
+			gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","SUFFIX",v.Args.RowIndex,V.Local.stemp2)
+			F.Intrinsic.Control.If(V.Screen.Form!optEdit.Value,=,"True")
+				'Build Call Wrapper String
+				F.Intrinsic.String.Build("{0}!*!{1}!*!O",V.Local.sTemp,V.Local.sTemp2,V.Local.sTemp)
+				F.Intrinsic.Control.CallSub(lockscreen)
+				F.Global.General.CallWrapperSync(2009,V.Local.sTemp)
+				F.Intrinsic.Control.CallSub(enablescreen)
+			F.Intrinsic.Control.Else
+				'Build Call Wrapper String
+				F.Intrinsic.String.Concat("7","!*!",V.Local.sTemp,"!*!",V.Local.sTemp2,"!*!","A",V.Local.sTemp)
+				F.Intrinsic.Control.CallSub(lockscreen)
+				F.Global.General.CallWrapperSync(450000,V.Local.sTemp)
+				F.Intrinsic.Control.CallSub(enablescreen)
+			F.Intrinsic.Control.EndIf
+
+		F.Intrinsic.Control.Case("SUFFIX")
+			gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","JOB",v.Args.RowIndex,v.Local.sTemp)
+			gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","SUFFIX",v.Args.RowIndex,V.Local.stemp2)
+			F.Intrinsic.Control.If(V.Screen.Form!optEdit.Value,=,"True")
+				'Build Call Wrapper String
+				F.Intrinsic.String.Build("{0}!*!{1}!*!O",V.Local.sTemp,V.Local.sTemp2,V.Local.sTemp)
+				F.Intrinsic.Control.CallSub(lockscreen)
+				F.Global.General.CallWrapperSync(2009,V.Local.sTemp)
+				F.Intrinsic.Control.CallSub(enablescreen)
+			F.Intrinsic.Control.Else
+				'Build Call Wrapper String
+				F.Intrinsic.String.Concat("7","!*!",V.Local.sTemp,"!*!",V.Local.sTemp2,"!*!","A",V.Local.sTemp)
+				F.Intrinsic.Control.CallSub(lockscreen)
+				F.Global.General.CallWrapperSync(450000,V.Local.sTemp)
+				F.Intrinsic.Control.CallSub(enablescreen)
+			F.Intrinsic.Control.EndIf
+
+		f.Intrinsic.Control.Case("DISPLAY_PART")
+			F.Intrinsic.Control.If(V.Screen.Form!optView.Value,=,True)
+				gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","PART",V.Args.RowIndex,V.Local.sPart)
+				gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","LOCATION",V.Args.RowIndex,V.Local.sLoc)
+				F.Intrinsic.String.Build("{0}!*!{1}!*!O",V.Local.sPart,V.Local.sLoc,V.Local.sParams)
+				F.Global.General.CallWrapperSync(300011,V.Local.sParams)
+			F.Intrinsic.Control.Else
+				gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","PART",V.Args.RowIndex,V.Local.sPart)
+				gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","LOCATION",V.Args.RowIndex,V.Local.sLoc)
+				F.Intrinsic.String.Build("{0}!*!{1}!*!M",V.Local.sPart,V.Local.sLoc,V.Local.sParams)
+				F.Global.General.CallWrapperSync(300011,V.Local.sParams)
+			F.Intrinsic.Control.EndIf
+
+		F.Intrinsic.Control.Case("PRINTED")
+		
+			F.Intrinsic.Control.If(V.Screen.Form!optView.Value,=,False)
+				F.Intrinsic.Control.If(V.Screen.Form!chkBarcode.Value,=,1)
+				
+					gui.Form.gsMaster.SetCellValueByColumnName("gvMaster","PRINTED",V.Args.RowIndex,True)
+					gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","JOB",V.Args.RowIndex,v.Local.sJob)
+					gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","SUFFIX",V.Args.RowIndex,v.Local.sSuf)
+					f.Intrinsic.String.Build("{0}!*!{1}!*!1811",V.Local.sJob,V.Local.sSuf,V.Local.sTemp)
+					F.Intrinsic.UI.InvokeWaitDialog("Printing Barcode WO ...")
+					F.Global.General.CallWrapperSync(900100,V.Local.sTemp)
+					f.Intrinsic.UI.CloseWaitDialog
+
+					'BN, July 2019, Print docs from Document Control
+					gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","PART",V.Args.RowIndex,V.Local.sPart)
+					gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","LOCATION",V.Args.RowIndex,V.Local.sLoc)
+					f.Intrinsic.String.RPad(v.Local.sPart," ",125,v.Local.sPart)
+
+					F.Global.DocumentControl.GetLinkID(v.Local.sPart,30,v.Local.iLinkID)
+					f.Intrinsic.String.Build("Select ltrim(rtrim(Path)) + ltrim(rtrim(File)) as FilePath FROM ATG_DOC_ASSOC where Link_ID = {0}",v.Local.iLinkID,v.Local.sSQL)
+
+					f.Intrinsic.Control.If(v.DataTable.Docs.Exists)
+						f.Data.DataTable.Close("Docs")
+					f.Intrinsic.Control.EndIf
+					f.Data.DataTable.CreateFromSQL("Docs","con",v.Local.sSQL,True)
+					f.Intrinsic.Control.If(v.DataTable.Docs.RowCount,>,0)
+						F.Intrinsic.UI.MsgBox("Do you want to print Documents for the Parts?","Print Documents",4,v.Local.sYesNo)
+						'User say No
+						f.Intrinsic.Control.If(v.Local.sYesNo,<>,7)		
+							f.Intrinsic.Control.For(v.Local.iCnt,0,v.DataTable.Docs.RowCount--,1)
+								'Check if file exists
+								v.Local.sFile.Set(v.DataTable.Docs(v.Local.iCnt).FilePath!FieldValString)
+								f.Intrinsic.File.Exists(v.Local.sFile,v.Local.bExist)
+								f.Intrinsic.Control.If(v.Local.bExist)								
+
+									'Call an Async process so user will not have to wait
+									'f.Intrinsic.String.Build("{0}\GCG_5567_Print.g2u",v.Caller.GasDir,v.Local.sPrintProgramPath)
+									'v.Local.sSwitches.Set(v.Local.sFile)
+									'function.Global.General.CallAsyncGAS(v.Local.sPrintProgramPath,v.Local.sSwitches,v.Local.iPIDReturn)
+									
+									f.Intrinsic.String.IsInString(v.Local.sFile.UCase,".SLDASM","True",v.Local.bExist)
+									f.Intrinsic.Control.If(v.Local.bExist.Not)
+										F.Intrinsic.Task.ShellExec(V.Local.iHndl,"PRINT",v.Local.sFile,"","",0)
+									f.Intrinsic.Control.EndIf								
+									
+								f.Intrinsic.Control.EndIf							
+							f.Intrinsic.Control.Next(v.Local.iCnt)							
+						f.Intrinsic.Control.EndIf						
+					f.Intrinsic.Control.EndIf					
+					
+				F.Intrinsic.Control.EndIf				
+				
+				F.Intrinsic.Control.If(V.Screen.Form!chkPicklist.Value,=,1)
+					gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","JOB",V.Args.RowIndex,v.Local.sJob)
+					gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","SUFFIX",V.Args.RowIndex,v.Local.sSuf)
+					F.Intrinsic.String.Build("{0}!*!{1}!*!{0}!*!{1}",V.Local.sJob,V.Local.sSuf,V.Local.sTemp)
+					F.Global.General.CallWrapperSync(900200,V.Local.sTemp)
+				F.Intrinsic.Control.EndIf							
+				
+			F.Intrinsic.Control.EndIf
+
+		F.Intrinsic.Control.CaseAny("CUR_OPER","NEXT_OPER")
+			F.Intrinsic.Control.If(V.Global.bExists)
+				F.Intrinsic.Control.If(V.Screen.Form!optView.Value,=,False)
+					F.Intrinsic.String.Build("SELECT MACHINE FROM WORKCENTERS WHERE MACHINE = '{0}';",V.Args.CellValue,V.Local.sSQL)
+					F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL,V.Local.sWC)
+					F.Intrinsic.Control.If(V.Local.sWC,<>,"")
+						F.Global.General.SetPassedDataElement("WC",V.Local.sWC)
+						F.Intrinsic.String.Build("{0}\GAB_4228_Repl_Upd_Resched_Utility.g2u",V.Caller.GasDir,V.Local.sGabFile)
+						F.Global.General.CallAsyncGAS(V.Local.sGabFile,V.Local.iPID)
+						F.Global.General.ResetPassedDataElements
+						gui.Form.cmdRefresh.BackColor(255)
+						gui.Form.lblStatus.ForeColor(255)
+						gui.Form.lblStatus.Caption("NOTE: Refresh Master Schedule to pickup changes from WC Dashboard")
+						gui.Form.lblStatus.Visible(True)
+					F.Intrinsic.Control.Else
+						F.Intrinsic.String.Build("SELECT WORK_GROUP FROM WORKGROUP_HEAD WHERE WORK_GROUP = '{0}';",V.Args.CellValue,V.Local.sSQL)
+						F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL,V.Local.sWG)
+						F.Intrinsic.Control.If(V.Local.sWG,<>,"")
+							F.Global.General.SetPassedDataElement("WG",V.Local.sWG)
+							F.Intrinsic.String.Build("{0}\GAB_4228_Repl_Upd_Resched_Utility.g2u",V.Caller.GasDir,V.Local.sGabFile)
+							F.Global.General.CallSyncGAS(V.Local.sGabFile,V.Local.iPID)
+							F.Global.General.ResetPassedDataElements
+							gui.Form.cmdRefresh.BackColor(255)
+							gui.Form.lblStatus.ForeColor(255)
+							gui.Form.lblStatus.Caption("NOTE: Refresh Master Schedule to pickup changes from WC Dashboard")
+							gui.Form.lblStatus.Visible(True)
+						F.Intrinsic.Control.Else
+							F.Intrinsic.UI.Msgbox("Not a valid WC or WG.","WC/WG Check")
+						F.Intrinsic.Control.EndIf
+					F.Intrinsic.Control.EndIf
+				F.Intrinsic.Control.EndIf
+			F.Intrinsic.Control.EndIf
+
+		F.Intrinsic.Control.Case("FLAG_HOLD")
+			F.Intrinsic.Control.If(V.Screen.Form!optView.Value,=,False)
+				gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","JOB",V.Args.RowIndex,V.Local.sJob)
+				gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","SUFFIX",V.Args.RowIndex,V.Local.sSuf)
+				F.Intrinsic.Control.If(V.Args.CellValue)
+					V.Local.sHold.Set("N")
+					V.Local.iHold.Set(0)
+					V.Local.bHold.Set(False)
+					gui.Form.gsMaster.SetCellValueByColumnName("gvMaster","FLAG_HOLD",V.Args.RowIndex,False)
+				F.Intrinsic.Control.Else
+					V.Local.sHold.Set("Y")
+					V.Local.iHold.Set(1)
+					V.Local.bHold.Set(True)
+					gui.Form.gsMaster.SetCellValueByColumnName("gvMaster","FLAG_HOLD",V.Args.RowIndex,True)
+				F.Intrinsic.Control.EndIf
+				F.Intrinsic.String.Build("UPDATE JOB_HEADER SET FLAG_HOLD = '{0}' WHERE JOB = '{1}' AND SUFFIX = '{2}';",V.Local.sHold,V.Local.sJob,V.Local.sSuf,V.Local.sSQL)
+				F.ODBC.Connection!con.Execute(V.Local.sSQL)
+				F.Intrinsic.String.Build("UPDATE APSV3_JBMASTER SET HOLD = '{0}' WHERE JOB = '{1}' AND SFX = '{2}';",V.Local.iHold,V.Local.sJob,V.Local.sSuf,V.Local.sSQL)
+				F.ODBC.Connection!con.Execute(V.Local.sSQL)
+			F.Intrinsic.Control.EndIf
+
+		F.Intrinsic.Control.Case("RELEASED")
+
+			F.Intrinsic.Control.If(V.Screen.Form!optView.Value,=,False)
+				gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","JOB",V.Args.RowIndex,V.Local.sJob)
+				gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","SUFFIX",V.Args.RowIndex,V.Local.sSuf)
+				
+				'Check if user click cell to turn to Released
+				F.Intrinsic.Control.If(V.Args.CellValue,=,False)
+					f.Intrinsic.UI.InvokeWaitDialog("Releasing...")
+					F.Intrinsic.String.Build("UPDATE JOB_HEADER SET FLAG_WO_RELEASED = 'Y', FLAG_WO_PRTD = 'R' WHERE JOB = '{0}' and Suffix = '{1}' ;",V.Local.sJob,v.Local.sSuf,V.Local.sSQL)
+					F.ODBC.Connection!con.Execute(V.Local.sSQL)					
+								
+					'Get Time Stamp
+					f.Intrinsic.String.Build("{0} Released {1}",v.Caller.User,v.Ambient.Now,v.Local.sTimeStamp)		
+					f.Data.DataTable.SetValue("dtMaster",V.Args.RowIndex,"RELEASED",True,"PRINTED",True,"WO_NOTE2",v.Local.sTimeStamp)
+					'Set Time Stamp						
+					F.Intrinsic.String.Build("SELECT * FROM WO_USER_FLDS WHERE JOB = '{0}' AND SUFFIX = '{1}';",v.Local.sJob,v.Local.sSuf,V.Local.sSQL)
+					F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL,v.Local.sRet)
+					F.Intrinsic.Control.If(v.Local.sRet,=,"")
+						F.Intrinsic.String.Build("INSERT INTO WO_USER_FLDS(JOB,SUFFIX,USER_6) VALUES('{0}','{1}','{2}');",v.Local.sJob,v.Local.sSuf,v.Local.sTimeStamp,V.Local.sSQL)							
+					F.Intrinsic.Control.Else
+						F.Intrinsic.String.Build("UPDATE WO_USER_FLDS SET USER_6 = '{2}' WHERE JOB = '{0}' AND SUFFIX = '{1}';",v.Local.sJob,v.Local.sSuf,v.Local.sTimeStamp,V.Local.sSQL)							
+					F.Intrinsic.Control.EndIf
+					F.ODBC.Connection!con.Execute(V.Local.sSQL)
+					
+
+				
+					'If Released, Print Barcode
+					f.Intrinsic.String.Build("{0}!*!{1}!*!1811",V.Local.sJob,V.Local.sSuf,V.Local.sTemp)
+					F.Global.General.CallWrapperSync(900100,V.Local.sTemp)
+					f.Intrinsic.UI.Sleep(15)
+				
+					f.Intrinsic.Control.If(v.Screen.Form!chkPrintAttach.Value,=,1)
+						'BN, June 2019, Print docs from Document Control
+						v.Local.sPart.Set(v.DataTable.dtMaster(v.Args.RowIndex).Part!FieldValString)
+						v.Local.sLoc.Set(v.DataTable.dtMaster(v.Args.RowIndex).Location!FieldValString)			
+						f.Intrinsic.String.RPad(v.Local.sPart," ",125,v.Local.sPart)
+						F.Global.DocumentControl.GetLinkID(v.Local.sPart,30,v.Local.iLinkID)
+						
+						f.Intrinsic.String.Build("Select ltrim(rtrim(Path)) + ltrim(rtrim(File)) as FilePath FROM ATG_DOC_ASSOC where Link_ID = {0}",v.Local.iLinkID,v.Local.sSQL)
+						f.Intrinsic.Control.If(v.DataTable.Docs.Exists)
+							f.Data.DataTable.Close("Docs")
+						f.Intrinsic.Control.EndIf
+						f.Data.DataTable.CreateFromSQL("Docs","con",v.Local.sSQL,True)
+						f.Intrinsic.Control.If(v.DataTable.Docs.RowCount,>,0)
+							f.Intrinsic.Control.For(v.Local.iInner,0,v.DataTable.Docs.RowCount--,1)
+								'Check if file exists
+								v.Local.sFile.Set(v.DataTable.Docs(v.Local.iInner).FilePath!FieldValString)
+								f.Intrinsic.File.Exists(v.Local.sFile,v.Local.bExist)
+								f.Intrinsic.Control.If(v.Local.bExist)
+									f.Intrinsic.String.IsInString(v.Local.sFile.UCase,".SLDASM","True",v.Local.bExist)
+									f.Intrinsic.Control.If(v.Local.bExist.Not)
+										F.Intrinsic.Task.ShellExec(V.Local.iHndl,"PRINT",v.Local.sFile,"","",0)
+									F.Intrinsic.Control.EndIf
+								f.Intrinsic.Control.EndIf							
+							f.Intrinsic.Control.Next(v.Local.iInner)
+						f.Intrinsic.Control.EndIf	
+					f.Intrinsic.Control.EndIf
+					f.Intrinsic.UI.CloseWaitDialog
+					
+				F.Intrinsic.Control.Else
+					f.Intrinsic.UI.InvokeWaitDialog("Unreleasing...")
+					'BN, Aug 16 If uncheck Realeased, will uncheck Printed automatically, per Susan request
+					F.Intrinsic.String.Build("UPDATE JOB_HEADER SET FLAG_WO_RELEASED = '',FLAG_WO_PRTD = ''  WHERE JOB = '{0}' and Suffix = '{1}'",V.Local.sJob,v.Local.sSuf,V.Local.sSQL)
+					F.ODBC.Connection!con.Execute(V.Local.sSQL)
+					'Get Time Stamp
+					f.Intrinsic.String.Build("{0} Unreleased {1}",v.Caller.User,v.Ambient.Now,v.Local.sTimeStamp)						
+					f.Data.DataTable.SetValue("dtMaster",v.Args.RowIndex,"RELEASED",False,"PRINTED",False,"WO_NOTE2",v.Local.sTimeStamp)
+					
+					'Set Time Stamp	
+					F.Intrinsic.String.Build("SELECT * FROM WO_USER_FLDS WHERE JOB = '{0}' AND SUFFIX = '{1}';",v.Local.sJob,v.Local.sSuf,V.Local.sSQL)
+					F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL,v.Local.sRet)
+					F.Intrinsic.Control.If(V.ODBC.con!rstNotes.EOF,=,True)
+						F.Intrinsic.String.Build("INSERT INTO WO_USER_FLDS(JOB,SUFFIX,USER_6) VALUES('{0}','{1}','{2}');",v.Local.sJob,v.Local.sSuf,v.Local.sTimeStamp,V.Local.sSQL)								
+					F.Intrinsic.Control.Else
+						F.Intrinsic.String.Build("UPDATE WO_USER_FLDS SET USER_6 = '{2}' WHERE JOB = '{0}' AND SUFFIX = '{1}';",v.Local.sJob,v.Local.sSuf,v.Local.sTimeStamp,V.Local.sSQL)							
+					F.Intrinsic.Control.EndIf
+					F.ODBC.Connection!con.Execute(V.Local.sSQL)	
+					f.Intrinsic.UI.CloseWaitDialog
+				F.Intrinsic.Control.EndIf				
+				
+			F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Control.EndSelect
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.GsMaster_RowCellClick.End
+
+Program.Sub.GsMaster_CellValueChanged.Start
+	v.Local.sWO.Declare
+	v.Local.sSuf.Declare
+	V.Local.sSQL.Declare
+	V.Local.sText.Declare
+	V.Local.sTextTbl.Declare
+
+	F.Intrinsic.Control.SelectCase(V.Args.column)
+		F.Intrinsic.Control.Case("WO_NOTE")
+			gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","JOB",V.Args.RowIndex,V.Local.sWO)
+			gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","SUFFIX",V.Args.RowIndex,V.Local.sSuf)
+			F.Intrinsic.String.Replace(V.Args.Value,"'","''",V.Local.sTextTbl)
+			F.Intrinsic.String.Build("SELECT * FROM GAB_4169_WO_NOTES WHERE JOB = '{0}' AND SUFFIX = '{1}';",V.Local.sWO,V.Local.sSuf,V.Local.sSQL)
+			F.ODBC.Connection!con.OpenRecordsetRW("rstNotes",V.Local.sSQL)
+			F.Intrinsic.Control.If(V.ODBC.con!rstNotes.EOF,=,True)
+				F.Intrinsic.String.Build("INSERT INTO GAB_4169_WO_NOTES(JOB,SUFFIX,NOTES) VALUES('{0}','{1}','{2}');",V.Local.sWO,V.Local.sSuf,V.Local.sTextTbl,V.Local.sSQL)
+				F.ODBC.Connection!con.Execute(V.Local.sSQL)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.String.Build("UPDATE GAB_4169_WO_NOTES SET NOTES = '{0}' WHERE JOB = '{1}' AND SUFFIX = '{2}';",V.Local.sTextTbl,V.Local.sWO,V.Local.sSuf,V.Local.sSQL)
+				F.ODBC.Connection!con.Execute(V.Local.sSQL)
+			F.Intrinsic.Control.EndIf
+			F.ODBC.con!rstNotes.Close
+
+		F.Intrinsic.Control.Case("WO_NOTE2")
+			gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","JOB",V.Args.RowIndex,V.Local.sWO)
+			gui.Form.gsMaster.GetCellValueByColumnName("gvMaster","SUFFIX",V.Args.RowIndex,V.Local.sSuf)
+			F.Intrinsic.String.Left(V.Args.Value,70,V.Local.sText)
+			F.Intrinsic.String.Replace(V.Local.sText,"'","''",V.Local.sTextTbl)
+			F.Intrinsic.String.Build("SELECT * FROM WO_USER_FLDS WHERE JOB = '{0}' AND SUFFIX = '{1}';",V.Local.sWO,V.Local.sSuf,V.Local.sSQL)
+			F.ODBC.Connection!con.OpenRecordsetRW("rstNotes",V.Local.sSQL)
+			F.Intrinsic.Control.If(V.ODBC.con!rstNotes.EOF,=,True)
+				F.Intrinsic.String.Build("INSERT INTO WO_USER_FLDS(JOB,SUFFIX,USER_6) VALUES('{0}','{1}','{2}');",V.Local.sWO,V.Local.sSuf,V.Local.sTextTbl,V.Local.sSQL)
+				F.ODBC.Connection!con.Execute(V.Local.sSQL)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.String.Build("UPDATE WO_USER_FLDS SET USER_6 = '{0}' WHERE JOB = '{1}' AND SUFFIX = '{2}';",V.Local.sTextTbl,V.Local.sWO,V.Local.sSuf,V.Local.sSQL)
+				F.ODBC.Connection!con.Execute(V.Local.sSQL)
+			F.Intrinsic.Control.EndIf
+			F.ODBC.con!rstNotes.Close
+
+	F.Intrinsic.Control.EndSelect
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.GsMaster_CellValueChanged.End
+
+Program.Sub.LockScreen.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	gui.Form.frameButtons.Enabled(False)
+	gui.Form.framePermissions.Enabled(False)
+	gui.Form.lblBegDt.Enabled(False)
+	gui.Form.dtpBegDt.Enabled(False)
+	gui.Form.lblCutDt.Enabled(False)
+	gui.Form.dtpCutDt.Enabled(False)
+	gui.Form.lblCutDay.Enabled(False)
+	gui.Form.txtCutDays.Enabled(False)
+	gui.Form.chkBarcode.Enabled(False)
+	gui.Form.chkPicklist.Enabled(False)
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.LockScreen.End
+
+Program.Sub.EnableScreen.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	gui.Form.lblBegDt.Enabled(True)
+	gui.Form.dtpBegDt.Enabled(True)
+	gui.Form.lblCutDt.Enabled(True)
+	gui.Form.dtpCutDt.Enabled(True)
+	gui.Form.lblCutDay.Enabled(True)
+	gui.Form.txtCutDays.Enabled(True)
+	gui.Form.chkBarcode.Enabled(True)
+	gui.Form.chkPicklist.Enabled(True)
+	gui.Form.frameButtons.Enabled(True)
+	gui.Form.framePermissions.Enabled(True)
+	gui.Form.lblStatus.Visible(False)
+	gui.Form.pbStatus.Visible(False)
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.EnableScreen.End
+
+Program.Sub.cmdExport_Click.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	V.Local.sFileExport.Declare
+	V.Local.bExcel.Declare
+	V.Local.bFileLocked.Declare
+	V.Local.sMsg.Declare
+
+	F.Automation.MSExcel.CheckPresence(V.Local.bExcel)
+
+
+	F.Intrinsic.Control.If(V.Local.bExcel)
+		F.Intrinsic.String.Build("{0}\GAB_5567_Master1Grid.xlsx",V.Caller.LocalGssTempDir,V.Local.sFileExport)
+		F.Intrinsic.File.IsFileLocked(V.Local.sFileExport,V.Local.bFileLocked)
+		F.Intrinsic.Control.If(V.Local.bFileLocked)
+			F.Intrinsic.String.Build("File is already open. Please close and export again.{0}File: {1}",V.Ambient.NewLine,V.Local.sFileExport,V.Local.sMsg)
+			F.Intrinsic.UI.Msgbox(V.Local.sMsg,"File In Use")
+		F.Intrinsic.Control.Else
+			gui.Form.gsMaster.Export(V.Local.sFileExport,"xlsx")
+			F.Intrinsic.Task.ShellExec(0,"",V.Local.sFileExport,"","",1)
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.Else
+		F.Intrinsic.String.Build("{0}\GAB_5567_Master1Grid.csv",V.Caller.LocalGssTempDir,V.Local.sFileExport)
+		F.Intrinsic.File.IsFileLocked(V.Local.sFileExport,V.Local.bFileLocked)
+		F.Intrinsic.Control.If(V.Local.bFileLocked)
+			F.Intrinsic.String.Build("File is already open. Please close and export again.{0}File: {1}",V.Ambient.NewLine,V.Local.sFileExport,V.Local.sMsg)
+			F.Intrinsic.UI.Msgbox(V.Local.sMsg,"File In Use")
+		F.Intrinsic.Control.Else
+			gui.Form.gsMaster.Export(V.Local.sFileExport,"csv")
+		F.Intrinsic.Control.EndIf
+		F.Intrinsic.Task.ShellExec(0,"",V.Local.sFileExport,"","",1)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.cmdExport_Click.End
+
+Program.Sub.cmdNew_Click.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	V.Local.iRowCnt.Declare
+	V.Local.iRowCnt2.Declare
+
+	F.ODBC.Connection!con.ExecuteAndReturn("SELECT COUNT(*) FROM JOB_HEADER;",V.Local.iRowCnt)
+
+	F.Intrinsic.Control.CallSub(lockscreen)
+	F.Global.General.CallWrapperSync(2009,"*!*!!*!N")
+
+	F.ODBC.Connection!con.ExecuteAndReturn("SELECT COUNT(*) FROM JOB_HEADER;",V.Local.iRowCnt2)
+
+	F.Intrinsic.Control.If(V.Local.iRowCnt,<>,V.Local.iRowCnt2)
+		F.Intrinsic.Control.CallSub(cmdrefresh_click)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.CallSub(enablescreen)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.cmdNew_Click.End
+
+Program.Sub.PrintPicklist.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	'PreProc for Printing Material Picklist from Dashboard
+
+	V.Local.iBIRunID.Declare
+	V.Local.iBILogID.Declare
+	V.local.iRet.Declare
+	V.Local.iRptID.Declare
+	V.Local.sParams.Declare
+	V.Local.sValues.Declare
+
+	F.Global.BI.GetIDFromName("GAB_5567_Mat_Picklist.rpt",V.Local.iRptID)
+
+	F.Global.BI.GetRunID(V.Local.iBIRunID)
+	F.Global.BI.StartLogging(V.Local.iBIRunID,V.Local.iRptID,0,"",V.Local.iBILogID)
+
+	F.Intrinsic.String.Split("JOB*!*SUFFIX","*!*",V.Local.sParams)
+	F.Intrinsic.String.Build("{0}*!*{1}",V.Args.Job,V.Args.Suffix,V.Local.sValues)
+	F.Intrinsic.String.Split(V.Local.sValues,"*!*",V.Local.sValues)
+
+	F.Intrinsic.Control.If(V.Local.iRptID,<,0)
+		F.Intrinsic.UI.Msgbox("GAB_5567_Mat_Picklist.rpt is not set in your system","Report not found")
+		F.Intrinsic.Control.ExitSub
+	F.Intrinsic.Control.Else
+		F.Global.BI.RunReportPreProcessor(V.Local.iBIRunID,V.Local.iBILogID,V.Local.sParams,V.Local.sValues,"",-1,True,"",-1,"",-1,"","",V.Local.iRet)
+	F.Intrinsic.Control.EndIf
+
+	F.Global.BI.StopLogging(V.Local.iBILogID)
+
+'	F.Global.BI.PrintReport(V.Local.iRepID,0,V.Local.sName,V.Local.sValue,False)
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.PrintPicklist.End
+
+Program.Sub.CheckPrint.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	V.Local.sRet.Declare
+	V.Local.bRet.Declare
+	V.Local.sSQL.Declare
+
+	F.ODBC.Connection!conC.OpenConnection(V.Ambient.Ccon,V.Ambient.Cuser,V.Ambient.Cpass)
+
+	F.Intrinsic.String.Build("SELECT REG_ID FROM GS_REGISTRY WHERE REG_ID = 5567 AND COMPANY = '{0}';",V.Caller.CompanyCode,V.Local.sSQL)
+	F.ODBC.Connection!conC.ExecuteAndReturn(V.Local.sSQL,V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet.IsNullOrWhitespace)
+		gui.Form.chkBarcode.Value(1)
+		gui.Form.chkPicklist.Value(1)
+	F.Intrinsic.Control.Else
+		F.Global.Registry.ReadValue(V.Caller.User,V.Caller.CompanyCode,"OCTSRS.NET.EXE",5567,1000,0,"",V.Local.bRet)
+		gui.Form.chkBarcode.Value(V.Local.bRet)
+		F.Global.Registry.ReadValue(V.Caller.User,V.Caller.CompanyCode,"OCTSRS.NET.EXE",5567,2000,0,"",V.Local.bRet)
+		gui.Form.chkPicklist.Value(V.Local.bRet)
+	F.Intrinsic.Control.EndIf
+
+	F.ODBC.Connection!conC.Close
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.CheckPrint.End
+
+Program.Sub.SavePrint.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	F.Intrinsic.Control.If(V.Screen.Form!chkBarcode.Value,=,1)
+		F.Global.Registry.AddValue(V.Caller.User,V.Caller.CompanyCode,"OCTSRS.NET.EXE",5567,1000,False,"Barcode",True,0,-999.0,1/1/1980,12:00:00 AM)
+	F.Intrinsic.Control.Else
+		F.Global.Registry.AddValue(V.Caller.User,V.Caller.CompanyCode,"OCTSRS.NET.EXE",5567,1000,False,"Barcode",False,0,-999.0,1/1/1980,12:00:00 AM)
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Control.If(V.Screen.Form!chkPicklist.Value,=,1)
+		F.Global.Registry.AddValue(V.Caller.User,V.Caller.CompanyCode,"OCTSRS.NET.EXE",5567,2000,False,"Picklist",True,0,-999.0,1/1/1980,12:00:00 AM)
+	F.Intrinsic.Control.Else
+		F.Global.Registry.AddValue(V.Caller.User,V.Caller.CompanyCode,"OCTSRS.NET.EXE",5567,2000,False,"Picklist",False,0,-999.0,1/1/1980,12:00:00 AM)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.SavePrint.End
+
+Program.Sub.txtCutDays_Change.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	V.Local.iDays.Declare
+	V.Local.dCutDt.Declare
+
+	F.Intrinsic.Control.If(V.Screen.Form!txtCutDays.Text,=,"")
+		V.Local.iDays.Set(0)
+	F.Intrinsic.Control.Else
+		V.Local.iDays.Set(V.Screen.Form!txtCutDays.Text)
+	F.Intrinsic.Control.EndIf
+	F.Global.Registry.AddValue(V.Caller.User,V.Caller.CompanyCode,"OCTSRS.NET.EXE",5567,3000,False,"Cutoff Days",False,V.Local.iDays,-999.0,1/1/1980,12:00:00 AM)
+	F.Intrinsic.Date.DateAdd("D",V.Screen.Form!txtCutDays.Text,V.Ambient.Date,V.Local.dCutDt)
+	gui.Form.dtpCutDt.Value(V.Local.dCutDt)
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.txtCutDays_Change.End
+
+Program.Sub.dtpCutDt_Change.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	V.Local.iDays.Declare
+
+	F.Intrinsic.Date.DateDiff("D",V.Ambient.Date,V.Screen.Form!dtpCutDt.Value,V.Local.iDays)
+	gui.Form.txtCutDays.Text(V.Local.iDays)
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.dtpCutDt_Change.End
+
+Program.Sub.Serialize.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	V.Local.sSerialize.Declare
+	
+	'gvMaster
+	gui.Form.gsMaster.Serialize("gvMaster",V.Local.sSerialize)
+	F.Global.Registry.AddValue(V.Caller.User,V.Caller.CompanyCode,"GVMaster",5567,1000,False,"Serialize",False,0,-999.0,1/1/1980,12:00:00 AM,V.Local.sSerialize)
+
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.Serialize.End
+
+Program.Sub.Deserialize.Start
+	F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	V.Local.sSerialize.Declare
+	
+	'Delete old registry records
+	F.Global.Registry.ReadValue(V.Caller.User,V.Caller.CompanyCode,"gvMaster",5567,0,5,"",V.Local.sSerialize)
+	F.Intrinsic.Control.If(V.Local.sSerialize,<>,"")
+		F.ODBC.Connection!common.OpenConnection(V.Ambient.Ccon,V.Ambient.Cuser,V.Ambient.Cpass)
+		F.ODBC.Connection!common.Execute("Delete From Gs_Registry Where Reg_ID = 5567 And Seq < 1000;")
+		F.ODBC.Connection!common.Close
+	F.Intrinsic.Control.EndIf
+
+	'gvMaster
+	F.Global.Registry.ReadValue(V.Caller.User,V.Caller.CompanyCode,"GVMaster",5567,1000,6,"",V.Local.sSerialize)
+	F.Intrinsic.Control.If(V.Local.sSerialize,<>,"")
+		gui.Form.gsMaster.Deserialize(V.Local.sSerialize)
+	F.Intrinsic.Control.EndIf
+
+	
+	F.Intrinsic.Control.Catch
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub("Unload")
+	F.Intrinsic.Control.EndTry
+Program.Sub.Deserialize.End
+
+Program.Sub.cmdUnReleaseMult_Click.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	v.Local.sTemp.Declare
+	v.Local.sSuf.Declare
+	v.Local.sJob.Declare
+	V.Local.sPart.Declare
+	v.Local.sLoc.Declare
+	v.Local.stemp2.Declare
+	v.Local.stemp3.Declare
+	V.Local.sParams.Declare
+	V.Local.iDayTrf.Declare
+	V.Local.iMonthTrf.Declare
+	V.Local.iYearTrf.Declare
+	V.Local.sSQL.Declare
+	V.Local.sWC.Declare
+	V.Local.sWG.Declare
+	V.Local.iPID.Declare
+	V.Local.sGabFile.Declare
+	V.Local.sHold.Declare
+	V.Local.iHold.Declare
+	V.Local.bHold.Declare
+	V.Local.bRel.Declare
+
+	v.Local.iLinkID.Declare	
+	v.Local.sYesNo.Declare
+	v.Local.iCnt.Declare
+	v.Local.sFile.Declare
+	v.Local.bExist.Declare
+	v.Local.iHndl.Declare
+
+
+	v.Local.sFilter.Declare
+	v.Local.sUSuffixes.Declare
+	v.Local.sTargetJobRows.Declare
+	v.Local.sTimeStamp.Declare
+	v.Local.iInner.Declare
+	v.Local.sRet.Declare
+	
+	v.Local.sPrintProgramPath.Declare
+	v.Local.sSwitches.Declare
+	v.Local.iPIDReturn.Declare	
+	
+	f.Intrinsic.Control.If(v.DataTable.dtMaster.Exists)
+		f.Data.DataView.SetFilter("dtMaster","MasterView","SelectForMultProcess = 1")
+		f.Intrinsic.Control.If(v.DataView.dtMaster!MasterView.RowCount,=,0)
+			f.Intrinsic.UI.Msgbox("Please select row to Release","Attention")
+			f.Intrinsic.Control.ExitSub
+		f.Intrinsic.Control.EndIf
+
+		f.Intrinsic.Control.If(V.Screen.Form!optView.Value,=,True)
+			f.Intrinsic.UI.Msgbox("Please select Edit Option","Attention")
+			f.Intrinsic.Control.ExitSub
+		f.Intrinsic.Control.EndIf
+		
+		f.Intrinsic.UI.InvokeWaitDialog("Processing Unrelease...")
+		gui.Form.lblProgress.Caption("Processing Unrelease...")
+		f.Intrinsic.Control.For(v.Local.iCnt,0,v.DataView.dtMaster!MasterView.RowCount--,1)
+			v.Local.sJob.Set(v.DataView.dtMaster!MasterView(v.Local.iCnt).Job!FieldValString)
+			v.Local.sSuf.Set(v.DataView.dtMaster!MasterView(v.Local.iCnt).Suffix!FieldValString)
+			F.Intrinsic.String.Build("UPDATE JOB_HEADER SET FLAG_WO_RELEASED = '',FLAG_WO_PRTD = '' WHERE JOB = '{0}' and Suffix = '{1}' ;",V.Local.sJob,v.Local.sSuf,V.Local.sSQL)
+			F.ODBC.Connection!con.Execute(V.Local.sSQL)
+			'Get Time Stamp
+			f.Intrinsic.String.Build("{0} UnReleased {1}",v.Caller.User,v.Ambient.Now,v.Local.sTimeStamp)
+			'Set Value to dtMaster
+			f.Data.DataView.SetValue("dtMaster","MasterView",v.Local.iCnt,"RELEASED",False,"PRINTED",False,"WO_NOTE2",v.Local.sTimeStamp)
+			'Set Time Stamp to WO_USER_FLDS
+			F.Intrinsic.String.Build("SELECT * FROM WO_USER_FLDS WHERE JOB = '{0}' AND SUFFIX = '{1}';",v.Local.sJob,v.Local.sSuf,V.Local.sSQL)
+			F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL,v.Local.sRet)
+			f.Intrinsic.Control.If(v.Local.sRet,<>,"")
+				F.Intrinsic.String.Build("UPDATE WO_USER_FLDS SET USER_6 = '{2}' WHERE JOB = '{0}' AND SUFFIX = '{1}';",v.Local.sJob,v.Local.sSuf,v.Local.sTimeStamp,V.Local.sSQL)
+			f.Intrinsic.Control.Else
+				F.Intrinsic.String.Build("INSERT INTO WO_USER_FLDS(JOB,SUFFIX,USER_6) VALUES('{0}','{1}','{2}');",v.Local.sJob,v.Local.sSuf,v.Local.sTimeStamp,V.Local.sSQL)
+			f.Intrinsic.Control.EndIf
+			F.ODBC.Connection!con.Execute(V.Local.sSQL)
+		
+		f.Intrinsic.Control.Next(v.Local.iCnt)
+		F.Intrinsic.Control.CallSub("cmdDeSelectAll_Click")
+		gui.Form.lblProgress.Caption("Unrelease done.")
+		f.Intrinsic.UI.CloseWaitDialog
+
+	f.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub("Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdUnReleaseMult_Click.End
+
+Program.Sub.cmdReleaseMult_Click.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	v.Local.sTemp.Declare
+	v.Local.sSuf.Declare
+	v.Local.sJob.Declare
+	V.Local.sPart.Declare
+	v.Local.sLoc.Declare
+	v.Local.stemp2.Declare
+	v.Local.stemp3.Declare
+	V.Local.sParams.Declare
+	V.Local.iDayTrf.Declare
+	V.Local.iMonthTrf.Declare
+	V.Local.iYearTrf.Declare
+	V.Local.sSQL.Declare
+	V.Local.sWC.Declare
+	V.Local.sWG.Declare
+	V.Local.iPID.Declare
+	V.Local.sGabFile.Declare
+	V.Local.sHold.Declare
+	V.Local.iHold.Declare
+	V.Local.bHold.Declare
+	V.Local.bRel.Declare
+
+	v.Local.iLinkID.Declare	
+	v.Local.sYesNo.Declare
+	v.Local.iCnt.Declare
+	v.Local.sFile.Declare
+	v.Local.bExist.Declare
+	v.Local.iHndl.Declare
+
+	v.Local.sFilter.Declare
+	v.Local.sUSuffixes.Declare
+	v.Local.sTargetJobRows.Declare
+	v.Local.sTimeStamp.Declare
+	v.Local.iInner.Declare
+	v.Local.sRet.Declare
+	
+	v.Local.sPrintProgramPath.Declare
+	v.Local.sSwitches.Declare
+	v.Local.iPIDReturn.Declare	
+	
+	f.Intrinsic.Control.If(v.DataTable.dtMaster.Exists)
+		f.Data.DataView.SetFilter("dtMaster","MasterView","SelectForMultProcess = 1")
+		f.Intrinsic.Control.If(v.DataView.dtMaster!MasterView.RowCount,=,0)
+			f.Intrinsic.UI.Msgbox("Please select row to Release","Attention")
+			f.Intrinsic.Control.ExitSub
+		f.Intrinsic.Control.EndIf		
+		
+		f.Intrinsic.Control.If(V.Screen.Form!optView.Value,=,True)
+			f.Intrinsic.UI.Msgbox("Please select Edit Option","Attention")
+			f.Intrinsic.Control.ExitSub
+		f.Intrinsic.Control.EndIf
+		
+		f.Intrinsic.UI.InvokeWaitDialog("Processing Release...")
+		gui.Form.lblProgress.Caption("Processing Release...")
+		f.Intrinsic.Control.For(v.Local.iCnt,0,v.DataView.dtMaster!MasterView.RowCount--,1)
+			v.Local.sJob.Set(v.DataView.dtMaster!MasterView(v.Local.iCnt).Job!FieldValString)
+			v.Local.sSuf.Set(v.DataView.dtMaster!MasterView(v.Local.iCnt).Suffix!FieldValString)
+			F.Intrinsic.String.Build("UPDATE JOB_HEADER SET FLAG_WO_RELEASED = 'Y', FLAG_WO_PRTD = 'R' WHERE JOB = '{0}' and Suffix = '{1}' ;",V.Local.sJob,v.Local.sSuf,V.Local.sSQL)
+			F.ODBC.Connection!con.Execute(V.Local.sSQL)
+			'Get Time Stamp
+			f.Intrinsic.String.Build("{0} Released {1}",v.Caller.User,v.Ambient.Now,v.Local.sTimeStamp)
+			'Set Value to dtMaster
+			f.Data.DataView.SetValue("dtMaster","MasterView",v.Local.iCnt,"RELEASED",True,"PRINTED",True,"WO_NOTE2",v.Local.sTimeStamp)
+			'Set Time Stamp to WO_USER_FLDS
+			F.Intrinsic.String.Build("SELECT * FROM WO_USER_FLDS WHERE JOB = '{0}' AND SUFFIX = '{1}';",v.Local.sJob,v.Local.sSuf,V.Local.sSQL)
+			F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL,v.Local.sRet)
+			f.Intrinsic.Control.If(v.Local.sRet,<>,"")
+				F.Intrinsic.String.Build("UPDATE WO_USER_FLDS SET USER_6 = '{2}' WHERE JOB = '{0}' AND SUFFIX = '{1}';",v.Local.sJob,v.Local.sSuf,v.Local.sTimeStamp,V.Local.sSQL)
+			f.Intrinsic.Control.Else
+				F.Intrinsic.String.Build("INSERT INTO WO_USER_FLDS(JOB,SUFFIX,USER_6) VALUES('{0}','{1}','{2}');",v.Local.sJob,v.Local.sSuf,v.Local.sTimeStamp,V.Local.sSQL)
+			f.Intrinsic.Control.EndIf
+			F.ODBC.Connection!con.Execute(V.Local.sSQL)
+			
+			'So Released, Print Barcode
+			f.Intrinsic.String.Build("{0}!*!{1}!*!1811",V.Local.sJob,V.Local.sSuf,V.Local.sTemp)
+
+			F.Global.General.CallWrapperSync(900100,V.Local.sTemp)
+			f.Intrinsic.UI.Sleep(15)
+			'Print docs from Document Control
+			v.Local.sPart.Set(v.Dataview.dtMaster!MasterView(v.Local.iCnt).Part!FieldValString)
+			v.Local.sLoc.Set(v.Dataview.dtMaster!MasterView(v.Local.iCnt).Location!FieldValString)			
+			f.Intrinsic.String.RPad(v.Local.sPart," ",125,v.Local.sPart)
+			F.Global.DocumentControl.GetLinkID(v.Local.sPart,30,v.Local.iLinkID)			
+
+			f.Intrinsic.Control.If(v.Screen.Form!chkPrintAttach.Value,=,1)
+
+				f.Intrinsic.String.Build("Select ltrim(rtrim(Path)) + ltrim(rtrim(File)) as FilePath FROM ATG_DOC_ASSOC where Link_ID = {0}",v.Local.iLinkID,v.Local.sSQL)
+				f.Intrinsic.Control.If(v.DataTable.Docs.Exists)
+					f.Data.DataTable.Close("Docs")
+				f.Intrinsic.Control.EndIf
+				f.Data.DataTable.CreateFromSQL("Docs","con",v.Local.sSQL,True)
+			
+				f.Intrinsic.Control.For(v.Local.iInner,0,v.DataTable.Docs.RowCount--,1)
+					'Check if file exists
+					v.Local.sFile.Set(v.DataTable.Docs(v.Local.iInner).FilePath!FieldValString)
+					f.Intrinsic.File.Exists(v.Local.sFile,v.Local.bExist)
+					f.Intrinsic.Control.If(v.Local.bExist)
+						'f.Intrinsic.String.Build("{0}\GCG_5567_Print.g2u",v.Caller.GasDir,v.Local.sPrintProgramPath)
+						'v.Local.sSwitches.Set(v.Local.sFile)
+						'function.Global.General.CallAsyncGAS(v.Local.sPrintProgramPath,v.Local.sSwitches,v.Local.iPIDReturn)	
+						f.Intrinsic.String.IsInString(v.Local.sFile.UCase,".SLDASM","True",v.Local.bExist)
+						f.Intrinsic.Control.If(v.Local.bExist.Not)
+							F.Intrinsic.Task.ShellExec(V.Local.iHndl,"PRINT",v.Local.sFile,"","",0)
+						F.Intrinsic.Control.EndIf
+					f.Intrinsic.Control.EndIf							
+				f.Intrinsic.Control.Next(v.Local.iInner)
+			
+			f.Intrinsic.Control.EndIf		
+			
+		f.Intrinsic.Control.Next(v.Local.iCnt)			
+		
+		F.Intrinsic.Control.CallSub("cmdDeSelectAll_Click")
+		gui.Form.lblProgress.Caption("Release Done.")
+		f.Intrinsic.UI.CloseWaitDialog
+	f.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub("Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdReleaseMult_Click.End
+
+Program.Sub.cmdDeSelectAll_Click.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare
+	
+	f.Intrinsic.Control.If(v.DataTable.dtMaster.Exists)
+		f.Data.DataTable.SetValue("dtMaster",-1,"SelectForMultProcess",False)
+	f.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub("Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdDeSelectAll_Click.End
+
+Program.Sub.Comments.Start
+${$0$}$GAB_5567_MasterSched_GM$}$JoeyT & AGV$}$08/22/2016 1:27:19 PM$}$False
+Program.Sub.Comments.End
